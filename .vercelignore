@@ -1,9 +1,7 @@
 node_modules
 .next
-data/store.json
+data
 fixtures
-.env*.local
-.DS_Store
-.vercel
 .env*
 !.env.example
+.DS_Store
