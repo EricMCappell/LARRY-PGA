@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getDashboard } from '../../lib/pool';
 import { money, timeAgo } from '../ui';
+import Avatar from '../avatar';
 
 export const dynamic = 'force-dynamic';
 
@@ -51,8 +52,11 @@ export default async function PlayersPage() {
               {players.map((p) => (
                 <tr key={p.espnId || p.name}>
                   <td>
-                    <span style={{ fontWeight: 550 }}>{p.name}</span>
-                    {!p.espnId && <span className="pill" style={{ marginLeft: 8 }}>unmatched</span>}
+                    <div className="player-row">
+                      <Avatar src={data.headshots?.[p.espnId]} name={p.name} />
+                      <span className="name">{p.name}</span>
+                      {!p.espnId && <span className="pill">unmatched</span>}
+                    </div>
                   </td>
                   <td className="num muted">{money(p.price, { short: true })}</td>
                   <td className="num">{money(p.banked)}</td>

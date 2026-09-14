@@ -29,7 +29,7 @@ export function EventBadge({ event }) {
   const live = !event.completed && event.round > 0;
   return (
     <span className={`pill ${live ? 'live' : ''}`}>
-      {live ? `● Round ${event.round}` : event.completed ? 'Final' : 'Starts soon'}
+      {live ? `Round ${event.round}` : event.completed ? 'Final' : 'Starts soon'}
     </span>
   );
 }

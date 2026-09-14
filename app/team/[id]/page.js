@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getDashboard } from '../../../lib/pool';
 import { money, timeAgo } from '../../ui';
+import Avatar from '../../avatar';
 
 export const dynamic = 'force-dynamic';
 
@@ -68,7 +69,8 @@ export default async function TeamPage({ params }) {
                 <tr key={p.name}>
                   <td>
                     <div className="player-row">
-                      <span style={{ fontWeight: 550 }}>{p.name}</span>
+                      <Avatar src={data.headshots?.[p.espnId]} name={p.name} />
+                      <span className="name">{p.name}</span>
                       {!p.espnId && <span className="pill">unmatched</span>}
                     </div>
                   </td>

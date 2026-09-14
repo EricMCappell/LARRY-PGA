@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { money } from '../ui';
+import Avatar from '../avatar';
 
 export default function LeaderboardTable({ players, live }) {
   const [onlyPool, setOnlyPool] = useState(false);
@@ -56,7 +57,12 @@ export default function LeaderboardTable({ players, live }) {
                 <td className="rank">
                   {p.made_cut ? p.position_text : <span className="pill cut">{p.out_reason}</span>}
                 </td>
-                <td><span style={{ fontWeight: p.teams.length ? 600 : 400 }}>{p.name}</span></td>
+                <td>
+                  <div className="player-row">
+                    <Avatar src={p.headshot} name={p.name} />
+                    <span className={p.teams.length ? 'name' : 'name plain'}>{p.name}</span>
+                  </div>
+                </td>
                 <td className="num">{p.score ?? '–'}</td>
                 <td className="num hide-sm muted">{p.thru_text || '–'}</td>
                 <td className="num">{p.amount ? money(p.amount) : <span className="muted">–</span>}</td>

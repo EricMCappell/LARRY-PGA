@@ -83,9 +83,11 @@ export default async function StandingsPage() {
             <tbody>
               {standings.map((team) => (
                 <tr key={team.id}>
-                  <td className="rank">{team.rank}</td>
+                  <td className={`rank${team.rank === 1 ? ' first' : team.rank === 2 ? ' second' : team.rank === 3 ? ' third' : ''}`}>
+                    {team.rank}
+                  </td>
                   <td>
-                    <Link href={`/team/${team.id}`} style={{ fontWeight: 600 }}>{team.name}</Link>
+                    <Link href={`/team/${team.id}`} className="name">{team.name}</Link>
                     {live && team.playing > 0 && (
                       <span className="pill live" style={{ marginLeft: 8 }}>{team.playing} playing</span>
                     )}
