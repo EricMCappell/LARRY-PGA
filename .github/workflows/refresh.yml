@@ -1,8 +1,10 @@
 name: Refresh pool data
 on:
   schedule:
-    - cron: '*/15 * * * 4,5,6,0'
-    - cron: '0 * * * 1,2,3'
+    # GitHub cron runs in UTC. Tournament play is roughly 11:00-02:00 UTC.
+    - cron: '*/15 11-23 * * 4,5,6,0'   # Thu-Sun daytime ET
+    - cron: '*/30 0-2 * * 5,6,0,1'     # evening ET (the next day in UTC)
+    - cron: '0 3-10 * * *'             # hourly overnight, picks up final payouts
   workflow_dispatch:
 concurrency:
   group: refresh
@@ -17,13 +19,14 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      # Diagnostic only. A plain curl with no custom headers; the Refresh step is
+      # the real test, so a non-200 here warns but doesn't fail the job.
       - name: Check ESPN is reachable from this runner
         run: |
-          code=$(curl -s -o /tmp/espn.json -w '%{http_code}' -H 'accept: application/json' -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36' 'https://site.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard')
+          code=$(curl -s -o /dev/null -w '%{http_code}' 'https://site.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard') || true
           echo "ESPN scoreboard returned $code"
           if [ "$code" != "200" ]; then
-            echo "::error::ESPN is not reachable from GitHub Actions (HTTP $code). Refresh from a machine it allows, or set ESPN_PROXY."
-            exit 1
+            echo "::warning::ESPN scoreboard returned HTTP $code to a plain curl from this runner. Continuing; see the Refresh step."
           fi
       - run: npm ci
       - name: Refresh
