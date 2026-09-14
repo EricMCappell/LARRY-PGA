@@ -73,15 +73,48 @@ this size.
    | `CRON_SECRET` | any random string; protects the refresh endpoint |
 
 4. **Deploy**, then open `/admin`, paste your teams, and hit *Refresh from PGA Tour*.
-5. **Schedule the refresh.** `vercel.json` already registers a daily cron. During
-   tournament weeks you want it more often than that, which Vercel's free tier
-   doesn't allow, so point a free external scheduler (cron-job.org works) at:
+5. **Schedule the refresh** — see the next section, which matters more than it
+   looks.
 
-   ```
-   https://your-app.vercel.app/api/refresh?key=YOUR_CRON_SECRET
-   ```
+---
 
-   Every 15 minutes Thursday through Sunday is plenty.
+## Keeping the data fresh (read this)
+
+**ESPN blocks requests from datacenter IP ranges.** The same code that works from
+a laptop gets `403 Forbidden` on Vercel. So the refresh usually cannot run on the
+web host itself, and `/api/refresh` will fail there. The site is unaffected — it
+only reads the database — but something has to do the fetching.
+
+Three ways, best first:
+
+**1. GitHub Actions (included).** `.github/workflows/refresh.yml` checks out the
+repo and runs `npm run refresh` against the same database: every 15 minutes
+Thursday–Sunday, hourly otherwise. Add one repository secret, `DATABASE_URL`
+(Settings → Secrets and variables → Actions), and run it once by hand from the
+Actions tab to confirm. The workflow's first step checks whether ESPN answers
+from GitHub's runners and fails with a clear message if it doesn't.
+
+**2. A schedule on a machine ESPN allows** (your own Mac). Reliable, but only
+while that machine is awake:
+
+```bash
+cd /path/to/LARRY-PGA && DATABASE_URL='...' npm run refresh
+```
+
+every 15 minutes during tournament rounds, via `launchd` or `cron`.
+
+**3. A proxy.** If neither of the above can reach ESPN, deploy the small
+Cloudflare Worker in `workers/espn-proxy.js` and set `ESPN_PROXY` to its URL.
+Every ESPN request then goes through Cloudflare's network instead. With that set,
+`/api/refresh` on Vercel works again, and a plain scheduler (cron-job.org, Vercel
+cron) can call it:
+
+```
+https://your-app/api/refresh?key=YOUR_CRON_SECRET
+```
+
+The endpoint always requires the secret, either as `?key=` or as an
+`Authorization: Bearer` header (which is what Vercel's own cron sends).
 
 ---
 

@@ -6,18 +6,30 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 /**
- * The scheduled refresh. Point a cron service at:
+ * The scheduled refresh.
+ *
  *   https://your-app/api/refresh?key=YOUR_CRON_SECRET
  *
- * Every 10–15 minutes during tournament rounds is plenty; once a day is fine
- * the rest of the week.
+ * Vercel's own cron sends `Authorization: Bearer $CRON_SECRET`, which is
+ * accepted too. Nothing else gets in: the secret is always required.
+ *
+ * Note that ESPN blocks requests from datacenter IP ranges, so this endpoint
+ * may fail from a cloud host even though the same code works from a laptop.
+ * See README — the GitHub Actions workflow writes to the same database without
+ * going through this route.
  */
 export async function GET(request) {
-  const key = new URL(request.url).searchParams.get('key');
   const expected = process.env.CRON_SECRET;
-  const fromVercelCron = request.headers.get('user-agent')?.includes('vercel-cron');
+  if (!expected) {
+    return NextResponse.json(
+      { error: 'CRON_SECRET is not set on the server, so refreshes are disabled.' },
+      { status: 503 }
+    );
+  }
 
-  if (expected && key !== expected && !fromVercelCron) {
+  const key = new URL(request.url).searchParams.get('key');
+  const bearer = (request.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
+  if (key !== expected && bearer !== expected) {
     return NextResponse.json({ error: 'Bad key.' }, { status: 401 });
   }
 
