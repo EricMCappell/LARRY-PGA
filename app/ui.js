@@ -7,13 +7,25 @@ export function money(value, { short = false } = {}) {
   return `$${n.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
 }
 
+// Tee times are shown in Eastern time everywhere, on the server and in the
+// browser alike, so the page reads the same for everyone.
+const TEE_TIME = new Intl.DateTimeFormat('en-US', {
+  timeZone: 'America/New_York',
+  weekday: 'long',
+  hour: 'numeric',
+  minute: '2-digit',
+});
+
 /**
  * ESPN's "thru" text is a tee-time timestamp until a player starts his round.
- * Show only real progress ("Thru 12", "F"); hide the timestamp.
+ * Show that as a readable tee time ("Saturday 9:45 AM ET"); once he's on the
+ * course, show his progress ("Thru 12", "F") as-is.
  */
 export function thruLabel(text) {
   const t = String(text || '');
-  return /^\d{4}-\d{2}-\d{2}T/.test(t) ? '' : t;
+  if (!/^\d{4}-\d{2}-\d{2}T/.test(t)) return t;
+  const date = new Date(t);
+  return Number.isNaN(date.getTime()) ? '' : `${TEE_TIME.format(date).replace(/\s+/g, ' ').replace(/ at /, ' ')} ET`;
 }
 
 export function Movement({ change }) {
