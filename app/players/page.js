@@ -34,7 +34,6 @@ export default async function PlayersPage() {
       <div className="panel">
         <div className="panel-head">
           <h2>{players.length} players rostered</h2>
-          <span className="small muted">Return = money won ÷ price paid</span>
         </div>
         <div className="scroll">
           <table>
@@ -43,7 +42,6 @@ export default async function PlayersPage() {
                 <th>Player</th>
                 <th className="num">Cost</th>
                 <th className="num">Won</th>
-                <th className="num">Return</th>
                 <th className="num hide-sm">Owned by</th>
                 <th className="hide-sm">Teams</th>
               </tr>
@@ -60,7 +58,6 @@ export default async function PlayersPage() {
                   </td>
                   <td className="num muted">{money(p.price, { short: true })}</td>
                   <td className="num">{money(p.banked)}</td>
-                  <td className="num">{p.price ? `${(p.banked / p.price).toFixed(2)}×` : '–'}</td>
                   <td className="num hide-sm muted">{p.teams.length}</td>
                   <td className="small hide-sm">
                     {p.teams.map((t, i) => (

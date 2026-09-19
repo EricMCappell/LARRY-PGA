@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getDashboard } from '../../../lib/pool';
-import { money, timeAgo } from '../../ui';
+import { money, timeAgo, thruLabel } from '../../ui';
 import Avatar from '../../avatar';
 
 export const dynamic = 'force-dynamic';
@@ -38,11 +38,6 @@ export default async function TeamPage({ params }) {
           </div>
         )}
         <div className="card">
-          <div className="label">Return on spend</div>
-          <div className="value">{team.spend ? `${(team.total / team.spend).toFixed(2)}×` : '–'}</div>
-          <div className="note">{money(team.spend, { short: true })} of cap used</div>
-        </div>
-        <div className="card">
           <div className="label">Cap left unspent</div>
           <div className="value">{money(spendLeft, { short: true })}</div>
           <div className="note">of {money(data.settings.salaryCap, { short: true })}</div>
@@ -58,7 +53,6 @@ export default async function TeamPage({ params }) {
                 <th>Player</th>
                 <th className="num hide-sm">Cost</th>
                 <th className="num">Won</th>
-                <th className="num hide-sm">Return</th>
                 {live && <th>This week</th>}
                 {live && <th className="num">Projected</th>}
                 <th className="hide-sm" style={{ width: 110 }}>Share</th>
@@ -76,12 +70,11 @@ export default async function TeamPage({ params }) {
                   </td>
                   <td className="num hide-sm muted">{money(p.price, { short: true })}</td>
                   <td className="num">{money(p.banked)}</td>
-                  <td className="num hide-sm muted">{p.price ? `${(p.total / p.price).toFixed(2)}×` : '–'}</td>
                   {live && (
                     <td className="small">
                       {p.inPlay
                         ? p.inPlay.made_cut
-                          ? <>{p.inPlay.position} <span className="muted">{p.inPlay.score} · {p.inPlay.thru}</span></>
+                          ? <>{p.inPlay.position} <span className="muted">{p.inPlay.score}{thruLabel(p.inPlay.thru) && ` · ${thruLabel(p.inPlay.thru)}`}</span></>
                           : <span className="pill cut">{p.inPlay.out_reason}</span>
                         : <span className="muted">not playing</span>}
                     </td>

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { money } from '../ui';
+import { money, thruLabel } from '../ui';
 import Avatar from '../avatar';
 
 export default function LeaderboardTable({ players, live }) {
@@ -64,7 +64,7 @@ export default function LeaderboardTable({ players, live }) {
                   </div>
                 </td>
                 <td className="num">{p.score ?? '–'}</td>
-                <td className="num hide-sm muted">{p.thru_text || '–'}</td>
+                <td className="num hide-sm muted">{thruLabel(p.thru_text) || '–'}</td>
                 <td className="num">{p.amount ? money(p.amount) : <span className="muted">–</span>}</td>
                 <td className="small">
                   {p.teams.length

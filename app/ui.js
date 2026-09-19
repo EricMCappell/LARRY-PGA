@@ -7,6 +7,15 @@ export function money(value, { short = false } = {}) {
   return `$${n.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
 }
 
+/**
+ * ESPN's "thru" text is a tee-time timestamp until a player starts his round.
+ * Show only real progress ("Thru 12", "F"); hide the timestamp.
+ */
+export function thruLabel(text) {
+  const t = String(text || '');
+  return /^\d{4}-\d{2}-\d{2}T/.test(t) ? '' : t;
+}
+
 export function Movement({ change }) {
   if (!change) return <span className="muted">–</span>;
   return change > 0
